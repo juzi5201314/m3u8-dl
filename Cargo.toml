@@ -1,0 +1,30 @@
+[package]
+name = "m3u8-dl"
+version = "0.1.0"
+authors = ["soeur <juzi201314@gmail.com>"]
+edition = "2018"
+license = "MIT"
+description = "m3u8 video downloader"
+homepage = "https://github.com/juzi5201314/m3u8-dl"
+repository = "https://github.com/juzi5201314/m3u8-dl"
+documentation = "https://github.com/juzi5201314/m3u8-dl"
+readme = "README.md"
+keywords = ["m3u8", "download", "downloader", "hls"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+anyhow = "1.0.32"
+argh = "0.1.3"
+url = "2.1.1"
+reqwest = "0.10.8"
+tokio = { version = "0.2.22", features = ["macros", "rt-threaded", "fs", "sync"] }
+m3u8-rs = "1.0.7"
+colored = "2.0.0"
+futures = "0.3.5"
+aes-stream = "0.2.1"
+rust-crypto = "0.2.36"
+ffcli = "0.1.6"
+log = "0.4.11"
+
+[[bin]]
+name = "m3u8-dl"
