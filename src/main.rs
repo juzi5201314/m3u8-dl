@@ -2,7 +2,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::fs::File;
 use std::hash::{Hash, Hasher};
-use std::io::{Cursor, Read};
+use std::io::{Cursor, Read, Stdout};
 use std::option::Option::Some;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -130,6 +130,12 @@ impl Key {
 pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::Result<()> {
     let mut key = Arc::new(Key::default());
     let count = play_list.segments.len();
+    let pb =  Arc::new(Mutex::new({
+        let mut pb = pbr::ProgressBar::new(count as u64);
+        pb.show_speed = false;
+        pb.show_time_left = false;
+        pb
+    }));
     let files = Arc::new(Mutex::new(HashMap::with_capacity(count)));
 
     let dir = Path::new(&args.cache_dir).join("m3u8-dl").join({
@@ -159,6 +165,7 @@ pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::
         if !args.reload && file_name.is_file() {
             if File::open(&file_name)?.metadata()?.len() != 0 {
                 println!("Pass {}", &file_name.file_name().unwrap().to_str().unwrap());
+                pb.lock().unwrap().inc();
                 files.lock().unwrap().insert(i, file_name);
                 continue
             }
@@ -168,6 +175,7 @@ pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::
         let key = key.clone();
         let files = files.clone();
         let semaphore = semaphore.clone();
+        let pb = pb.clone();
 
         tasks.push(tokio::task::spawn(async move {
             async fn func(
@@ -176,12 +184,13 @@ pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::
                 files: Arc<Mutex<HashMap<usize, PathBuf>>>,
                 semaphore: Arc<Semaphore>,
                 i: usize,
-                file_name: PathBuf
+                file_name: PathBuf,
+                pb: Arc<Mutex<pbr::ProgressBar<Stdout>>>
             ) -> anyhow::Result<()> {
                 #[allow(unused_variables)]
                 let p = semaphore.acquire().await;
 
-                println!("Start #{}", i + 1);
+                //println!("Start #{}", i + 1);
 
                 let mut data = download(&url).await?;
 
@@ -194,11 +203,11 @@ pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::
                 //file.sync_data().await.unwrap();
                 println!("Completed #{}", i + 1);
                 files.lock().unwrap().insert(i, file_name);
+                pb.lock().unwrap().inc();
 
-                //permit.forget()
                 Ok(())
             };
-            func(url, key, files, semaphore, i, file_name).await
+            func(url, key, files, semaphore, i, file_name, pb).await
         }));
     }
 
@@ -206,6 +215,7 @@ pub async fn parse_media_list(play_list: MediaPlaylist, args: &Args) -> anyhow::
         res??;
     }
     //futures::future::join_all(tasks).await;
+    pb.lock().unwrap().finish();
     println!("done! Merging...");
 
     let output = format!("{}.{}", args.output.as_ref().unwrap_or(&"output".to_owned()), "ts");

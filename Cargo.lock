@@ -132,6 +132,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3a71ab494c0b5b860bdc8407ae08978052417070c2ced38573a9157ad75b8ac"
 
 [[package]]
+name = "crossbeam-channel"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09ee0cc8804d5393478d743b035099520087a5186f3b93fa58cec08fa62407b6"
+dependencies = [
+ "cfg-if",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-utils"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3c7c73a2d1e9fc0886a08b93e98eb643461230d5f1925e4036204d5f2e261a8"
+dependencies = [
+ "autocfg",
+ "cfg-if",
+ "lazy_static",
+]
+
+[[package]]
 name = "dtoa"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -409,6 +430,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-rustls"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37743cc83e8ee85eacfce90f2f4102030d9ff0a95244098d781e9bee4a90abb6"
+dependencies = [
+ "bytes",
+ "futures-util",
+ "hyper",
+ "log",
+ "rustls",
+ "tokio",
+ "tokio-rustls",
+ "webpki",
+]
+
+[[package]]
 name = "hyper-tls"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -528,6 +565,7 @@ dependencies = [
  "futures",
  "log",
  "m3u8-rs",
+ "pbr",
  "reqwest",
  "rust-crypto",
  "tokio",
@@ -679,6 +717,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
+name = "openssl-src"
+version = "111.10.2+1.1.1g"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a287fdb22e32b5b60624d4a5a7a02dbe82777f730ec0dbc42a0554326fef5a70"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -687,8 +734,21 @@ dependencies = [
  "autocfg",
  "cc",
  "libc",
+ "openssl-src",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "pbr"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74333e3d1d8bced07fd0b8599304825684bcdb4a1fcc6fa6a470e6e08cefd254"
+dependencies = [
+ "crossbeam-channel",
+ "libc",
+ "time",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -888,6 +948,7 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
+ "hyper-rustls",
  "hyper-tls",
  "ipnet",
  "js-sys",
@@ -898,15 +959,33 @@ dependencies = [
  "native-tls",
  "percent-encoding",
  "pin-project-lite",
+ "rustls",
  "serde",
  "serde_urlencoded",
  "tokio",
+ "tokio-rustls",
  "tokio-tls",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "webpki-roots",
  "winreg",
+]
+
+[[package]]
+name = "ring"
+version = "0.16.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "952cd6b98c85bbc30efa1ba5783b8abf12fec8b3287ffa52605b9432313e34e4"
+dependencies = [
+ "cc",
+ "libc",
+ "once_cell",
+ "spin",
+ "untrusted",
+ "web-sys",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -929,6 +1008,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
+name = "rustls"
+version = "0.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d1126dcf58e93cee7d098dbda643b5f92ed724f1f6a63007c1116eed6700c81"
+dependencies = [
+ "base64",
+ "log",
+ "ring",
+ "sct",
+ "webpki",
+]
+
+[[package]]
 name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -942,6 +1034,16 @@ checksum = "8f05ba609c234e60bee0d547fe94a4c7e9da733d1c962cf6e59efa4cd9c8bc75"
 dependencies = [
  "lazy_static",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "sct"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3042af939fca8c3453b7af0f1c66e533a15a86169e39de2657310ade8f98d3c"
+dependencies = [
+ "ring",
+ "untrusted",
 ]
 
 [[package]]
@@ -1013,6 +1115,12 @@ dependencies = [
  "redox_syscall",
  "winapi 0.3.9",
 ]
+
+[[package]]
+name = "spin"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "static_assertions"
@@ -1113,6 +1221,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-rustls"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "228139ddd4fea3fa345a29233009635235833e52807af7ea6448ead03890d6a9"
+dependencies = [
+ "futures-core",
+ "rustls",
+ "tokio",
+ "webpki",
+]
+
+[[package]]
 name = "tokio-tls"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1206,6 +1326,12 @@ name = "unicode-xid"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
+
+[[package]]
+name = "untrusted"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "url"
@@ -1328,6 +1454,25 @@ checksum = "dda38f4e5ca63eda02c059d243aa25b5f35ab98451e518c51612cd0f1bd19a47"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "webpki"
+version = "0.21.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab146130f5f790d45f82aeeb09e55a256573373ec64409fc19a6fb82fb1032ae"
+dependencies = [
+ "ring",
+ "untrusted",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8eff4b7516a57307f9349c64bf34caa34b940b66fed4b2fb3136cb7386e5739"
+dependencies = [
+ "webpki",
 ]
 
 [[package]]
